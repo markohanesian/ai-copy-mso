@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const { Pool } = require('pg');
-const axios = require('axios'); // You can continue using axios or switch to the OpenAI SDK
+const axios = require('axios');
 require('dotenv').config();
 
 const app = express();
@@ -21,6 +21,28 @@ const pool = new Pool({
 app.get('/presets', async (req, res) => {
     try {
         const result = await pool.query('SELECT * FROM presets');
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server error');
+    }
+});
+
+// Route for fetching tones
+app.get('/tones', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM tones');
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server error');
+    }
+});
+
+// Route for fetching industries
+app.get('/industries', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM industries');
         res.json(result.rows);
     } catch (err) {
         console.error(err);
@@ -65,7 +87,7 @@ app.post('/generate', async (req, res) => {
 
         res.json({ copy: generatedCopy });
     } catch (err) {
-        console.error('Error generating copy:', err); // More detailed logging
+        console.error('Error generating copy:', err);
         res.status(500).send('Server error');
     }
 });
