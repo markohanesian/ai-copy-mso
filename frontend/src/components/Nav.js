@@ -22,7 +22,7 @@ export default function ButtonAppBar() {
             aria-label="menu"
             sx={{ mr: 2 }}
           >
-            <AutoFixHighIcon sx={{ color: "#121314" }} />
+            <AutoFixHighIcon sx={{ color: "#fe5722" }} />
           </IconButton>
           <Typography
             variant="h6"
