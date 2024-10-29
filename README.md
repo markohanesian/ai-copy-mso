@@ -1,4 +1,4 @@
-# MarketingCopyAI
+# AI Copy
 
 ![MarketingCopyAI preview image](/frontend/public/app-preview.jpg)
 
