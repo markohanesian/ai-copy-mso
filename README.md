@@ -1,6 +1,6 @@
 # MarketingCopyAI
 
-![MarketingCopyAI preview image](/public/app-preview.jpg)
+![MarketingCopyAI preview image](/frontend/public/app-preview.jpg)
 
 ## Links
 * [Marketing Copy AI](https://github.com/markohanesian/marketing-copy-ai)
