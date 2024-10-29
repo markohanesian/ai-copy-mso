@@ -1,44 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
-import { Box, Typography, Button, MenuItem, Select, FormControl, InputLabel, TextField } from '@mui/material';
+import { Box, Button, Typography, TextField, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import CopySnackbar from './CopySnackbar.js'; // Import your Snackbar component
-import LoadingSkeleton from './LoadingSkeleton'; // Import the LoadingSkeleton component
+import ProgressButton from './ProgressButton'; // Import the new ProgressButton component
+import LoadingSkeleton from './LoadingSkeleton'; // Import your LoadingSkeleton component
 
 const CopyGenerator = () => {
     const [tone, setTone] = useState('');
     const [industry, setIndustry] = useState('');
     const [prompt, setPrompt] = useState('');
     const [generatedCopy, setGeneratedCopy] = useState('');
-    const [snackbarOpen, setSnackbarOpen] = useState(false); // State for Snackbar
-    const [tones, setTones] = useState([]); // State for tones
-    const [industries, setIndustries] = useState([]); // State for industries
-    const [loading, setLoading] = useState(false); // State for loading
-
-    useEffect(() => {
-        const fetchTones = async () => {
-            try {
-                const response = await axios.get('http://localhost:5000/tones');
-                setTones(response.data);
-            } catch (error) {
-                console.error("Error fetching tones:", error);
-            }
-        };
-
-        const fetchIndustries = async () => {
-            try {
-                const response = await axios.get('http://localhost:5000/industries');
-                setIndustries(response.data);
-            } catch (error) {
-                console.error("Error fetching industries:", error);
-            }
-        };
-
-        fetchTones();
-        fetchIndustries();
-    }, []);
+    const [loading, setLoading] = useState(false); // Loading state
+    const [snackbarOpen, setSnackbarOpen] = useState(false); // Snackbar state
 
     const handleGenerate = async () => {
-        setLoading(true); // Set loading to true
+        setLoading(true); // Set loading to true when starting the request
         try {
             const response = await axios.post('http://localhost:5000/generate', {
                 tone,
@@ -49,17 +25,17 @@ const CopyGenerator = () => {
         } catch (error) {
             console.error("Error generating copy:", error);
         } finally {
-            setLoading(false); // Set loading to false after generation
+            setLoading(false); // Reset loading state after the request completes
         }
     };
 
     const handleCopy = () => {
-        navigator.clipboard.writeText(generatedCopy); // Copy the generated text to clipboard
-        setSnackbarOpen(true); // Open the Snackbar
+        navigator.clipboard.writeText(generatedCopy);
+        setSnackbarOpen(true);
     };
 
     const handleSnackbarClose = () => {
-        setSnackbarOpen(false); // Close the Snackbar
+        setSnackbarOpen(false);
     };
 
     return (
@@ -92,56 +68,45 @@ const CopyGenerator = () => {
             />
 
             <FormControl variant="outlined" sx={{ backgroundColor: '#fff', width: '100%' }}>
-                <InputLabel id="tone-select-label">Select Tone</InputLabel>
+                <InputLabel id="tone-select-label">Tone</InputLabel>
                 <Select
                     labelId="tone-select-label"
                     value={tone}
                     onChange={(e) => setTone(e.target.value)}
-                    label="Select Tone"
+                    label="Tone"
                 >
-                    <MenuItem value="">
-                        <em>Select a tone</em>
-                    </MenuItem>
-                    {tones.map((tone) => (
-                        <MenuItem key={tone.id} value={tone.tone}>
-                            {tone.tone}
-                        </MenuItem>
-                    ))}
+                    <MenuItem value="casual">Casual</MenuItem>
+                    <MenuItem value="formal">Formal</MenuItem>
+                    <MenuItem value="friendly">Friendly</MenuItem>
+                    <MenuItem value="exciting">Exciting</MenuItem>
                 </Select>
             </FormControl>
 
             <FormControl variant="outlined" sx={{ backgroundColor: '#fff', width: '100%' }}>
-                <InputLabel id="industry-select-label">Select Industry</InputLabel>
+                <InputLabel id="industry-select-label">Industry</InputLabel>
                 <Select
                     labelId="industry-select-label"
                     value={industry}
                     onChange={(e) => setIndustry(e.target.value)}
-                    label="Select Industry"
+                    label="Industry"
                 >
-                    <MenuItem value="">
-                        <em>Select an industry</em>
-                    </MenuItem>
-                    {industries.map((industry) => (
-                        <MenuItem key={industry.id} value={industry.industry}>
-                            {industry.industry}
-                        </MenuItem>
-                    ))}
+                    <MenuItem value="clothing">Clothing</MenuItem>
+                    <MenuItem value="accessories">Accessories</MenuItem>
+                    <MenuItem value="jewelry">Jewelry & Watches</MenuItem>
+                    <MenuItem value="household">Household Essentials</MenuItem>
+                    <MenuItem value="electronics">Electronics</MenuItem>
+                    <MenuItem value="food">Food & Grocery</MenuItem>
                 </Select>
             </FormControl>
 
-            <Button
-                variant="contained"
+            <ProgressButton
+                loading={loading}
                 onClick={handleGenerate}
-                sx={{
-                    backgroundColor: '#121314',
-                    color: '#fff',
-                    width: '100%',
-                }}
-            >
-                Generate
-            </Button>
+                label="Generate"
+            />
 
-            {loading ? ( // Conditional rendering for loading
+            {/* Show the skeleton loader while loading */}
+            {loading ? (
                 <LoadingSkeleton />
             ) : (
                 generatedCopy && (
