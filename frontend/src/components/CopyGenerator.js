@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Box, Typography, Button, MenuItem, Select, FormControl, InputLabel, TextField } from '@mui/material';
 import CopySnackbar from './CopySnackbar.js'; // Import your Snackbar component
@@ -9,6 +9,31 @@ const CopyGenerator = () => {
     const [prompt, setPrompt] = useState('');
     const [generatedCopy, setGeneratedCopy] = useState('');
     const [snackbarOpen, setSnackbarOpen] = useState(false); // State for Snackbar
+    const [tones, setTones] = useState([]); // State for tones
+    const [industries, setIndustries] = useState([]); // State for industries
+
+    useEffect(() => {
+        const fetchTones = async () => {
+            try {
+                const response = await axios.get('http://localhost:5000/tones');
+                setTones(response.data);
+            } catch (error) {
+                console.error("Error fetching tones:", error);
+            }
+        };
+
+        const fetchIndustries = async () => {
+            try {
+                const response = await axios.get('http://localhost:5000/industries');
+                setIndustries(response.data);
+            } catch (error) {
+                console.error("Error fetching industries:", error);
+            }
+        };
+
+        fetchTones();
+        fetchIndustries();
+    }, []);
 
     const handleGenerate = async () => {
         try {
@@ -62,30 +87,40 @@ const CopyGenerator = () => {
             />
 
             <FormControl variant="outlined" sx={{ backgroundColor: '#fff', width: '100%' }}>
-                <InputLabel id="tone-select-label">Tone</InputLabel>
+                <InputLabel id="tone-select-label">Select Tone</InputLabel>
                 <Select
                     labelId="tone-select-label"
                     value={tone}
                     onChange={(e) => setTone(e.target.value)}
-                    label="Tone"
+                    label="Select Tone"
                 >
-                    <MenuItem value="casual">Casual</MenuItem>
-                    <MenuItem value="formal">Formal</MenuItem>
-                    {/* Add more options as needed */}
+                    <MenuItem value="">
+                        <em>Select a tone</em>
+                    </MenuItem>
+                    {tones.map((tone) => (
+                        <MenuItem key={tone.id} value={tone.tone}>
+                            {tone.tone}
+                        </MenuItem>
+                    ))}
                 </Select>
             </FormControl>
 
             <FormControl variant="outlined" sx={{ backgroundColor: '#fff', width: '100%' }}>
-                <InputLabel id="industry-select-label">Industry</InputLabel>
+                <InputLabel id="industry-select-label">Select Industry</InputLabel>
                 <Select
                     labelId="industry-select-label"
                     value={industry}
                     onChange={(e) => setIndustry(e.target.value)}
-                    label="Industry"
+                    label="Select Industry"
                 >
-                    <MenuItem value="clothing">Clothing</MenuItem>
-                    <MenuItem value="accessories">Accessories</MenuItem>
-                    {/* Add more options as needed */}
+                    <MenuItem value="">
+                        <em>Select an industry</em>
+                    </MenuItem>
+                    {industries.map((industry) => (
+                        <MenuItem key={industry.id} value={industry.industry}>
+                            {industry.industry}
+                        </MenuItem>
+                    ))}
                 </Select>
             </FormControl>
 
