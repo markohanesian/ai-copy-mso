@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Box, Typography, Button, MenuItem, Select, FormControl, InputLabel, TextField } from '@mui/material';
 import CopySnackbar from './CopySnackbar.js'; // Import your Snackbar component
+import LoadingSkeleton from './LoadingSkeleton'; // Import the LoadingSkeleton component
 
 const CopyGenerator = () => {
     const [tone, setTone] = useState('');
@@ -11,6 +12,7 @@ const CopyGenerator = () => {
     const [snackbarOpen, setSnackbarOpen] = useState(false); // State for Snackbar
     const [tones, setTones] = useState([]); // State for tones
     const [industries, setIndustries] = useState([]); // State for industries
+    const [loading, setLoading] = useState(false); // State for loading
 
     useEffect(() => {
         const fetchTones = async () => {
@@ -36,6 +38,7 @@ const CopyGenerator = () => {
     }, []);
 
     const handleGenerate = async () => {
+        setLoading(true); // Set loading to true
         try {
             const response = await axios.post('http://localhost:5000/generate', {
                 tone,
@@ -45,6 +48,8 @@ const CopyGenerator = () => {
             setGeneratedCopy(response.data.copy);
         } catch (error) {
             console.error("Error generating copy:", error);
+        } finally {
+            setLoading(false); // Set loading to false after generation
         }
     };
 
@@ -136,13 +141,17 @@ const CopyGenerator = () => {
                 Generate
             </Button>
 
-            {generatedCopy && (
-                <Box sx={{ backgroundColor: '#fff', padding: 2, borderRadius: 1, width: '100%', marginTop: 2 }}>
-                    <Typography variant="body1">{generatedCopy}</Typography>
-                    <Button onClick={handleCopy} sx={{ marginTop: "1rem" }} variant="outlined">
-                        Copy to Clipboard
-                    </Button>
-                </Box>
+            {loading ? ( // Conditional rendering for loading
+                <LoadingSkeleton />
+            ) : (
+                generatedCopy && (
+                    <Box sx={{ backgroundColor: '#fff', padding: 2, borderRadius: 1, width: '100%', marginTop: 2 }}>
+                        <Typography variant="body1">{generatedCopy}</Typography>
+                        <Button onClick={handleCopy} sx={{ marginTop: "1rem" }} variant="outlined">
+                            Copy to Clipboard
+                        </Button>
+                    </Box>
+                )
             )}
 
             <CopySnackbar open={snackbarOpen} onClose={handleSnackbarClose} message="Copied to clipboard!" />
