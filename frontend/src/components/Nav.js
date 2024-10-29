@@ -33,7 +33,7 @@ export default function ButtonAppBar() {
           </Typography>
           <Button
             color="inherit"
-            href="https://github.com/markohanesian/marketing-copy-ai"
+            href="https://github.com/markohanesian/ai-copy-mso"
             sx={{ color: "#121314" }}
           >
             GitHub
