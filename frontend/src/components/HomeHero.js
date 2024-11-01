@@ -10,9 +10,8 @@ const HomeHero = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 height: '30vh',
-                padding: 2,
-                backgroundColor: '#f5f5f5', // Light background for a polished look
                 textAlign: 'center',
+                maxWidth: '400px',
             }}
         >
             <Typography
@@ -22,9 +21,10 @@ const HomeHero = () => {
                     fontFamily: 'Inter, sans-serif',
                     fontWeight: 700,
                     fontSize: '2rem', // Adjust the size as needed
+                    color: "#FF5722"
                 }}
             >
-                Generate marketing copy powered by AI
+                Generate marketing copy, powered by AI
             </Typography>
             <Typography
                 variant="h6"
@@ -32,12 +32,12 @@ const HomeHero = () => {
                 sx={{
                     fontFamily: 'Inter, sans-serif',
                     fontWeight: 400,
-                    fontSize: '1.25rem',
+                    fontSize: '1rem',
                     marginTop: 2,
                     color: '#555', // A subtle color for the subtext
                 }}
             >
-                e.g., "Give me a fun product description for a women's fall jacket."
+                "Give me a fun product description for a women's fall jacket."
             </Typography>
         </Box>
     );
