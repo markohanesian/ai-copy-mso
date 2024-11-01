@@ -50,10 +50,6 @@ const CopyGenerator = () => {
                 margin: 'auto',
             }}
         >
-            <Typography variant="h6" component="h2" gutterBottom>
-                Generate Marketing Copy
-            </Typography>
-
             <TextField
                 multiline
                 rows={4}
