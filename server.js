@@ -8,8 +8,15 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 5000;
 
+// CORS configuration
+const corsOptions = {
+    origin: 'http://localhost:3000', // Allow requests from your frontend URL
+    methods: ['GET', 'POST'], // Specify allowed methods
+    credentials: true, // Enable cookies with cross-origin requests if needed
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions)); // Use the CORS middleware with options
 app.use(bodyParser.json());
 
 // PostgreSQL connection
