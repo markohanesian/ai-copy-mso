@@ -13,6 +13,7 @@ const ProgressButton = ({ loading, onClick, label }) => {
     }),
     width: "-webkit-fill-available",
     backgroundColor: "#FF5722",
+    textTransform: "none"
   };
 
   return (
