@@ -2,8 +2,5 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-body {
-  background-color: #e7ebee;
+  padding: 2rem;
 }

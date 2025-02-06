@@ -11,17 +11,16 @@ const HomeHero = () => {
                 justifyContent: 'center',
                 height: '30vh',
                 textAlign: 'center',
-                maxWidth: '400px',
+                padding: 3,
             }}
         >
             <Typography
                 variant="h1"
                 component="h1"
                 sx={{
-                    fontFamily: 'Inter, sans-serif',
+                    fontFamily: '"Josefin Sans", sans-serif', // New font
                     fontWeight: 700,
-                    fontSize: '2rem', // Adjust the size as needed
-                    color: "#FF5722"
+                    fontSize: '3rem',
                 }}
             >
                 Generate marketing copy, powered by AI
@@ -34,7 +33,6 @@ const HomeHero = () => {
                     fontWeight: 400,
                     fontSize: '1rem',
                     marginTop: 2,
-                    color: '#555', // A subtle color for the subtext
                 }}
             >
                 "Give me a fun product description for a women's fall jacket."

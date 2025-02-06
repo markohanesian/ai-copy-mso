@@ -13,7 +13,7 @@ import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
 export default function ButtonAppBar() {
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static" sx={{ backgroundColor: "#fff" }}>
+      <AppBar position="static" sx={{ backgroundColor: "#fe5722" }}>
         <Toolbar>
           <IconButton
             size="large"
@@ -22,19 +22,19 @@ export default function ButtonAppBar() {
             aria-label="menu"
             sx={{ mr: 2 }}
           >
-            <AutoFixHighIcon sx={{ color: "#fe5722" }} />
+            <AutoFixHighIcon sx={{ color: "#ffffff" }} />
           </IconButton>
           <Typography
             variant="h6"
             component="div"
-            sx={{ flexGrow: 1, color: "#121314" }}
+            sx={{ flexGrow: 1, color: "#ffffff" }}
           >
             AI Copy by MSO{" "}
           </Typography>
           <Button
             color="inherit"
             href="https://github.com/markohanesian/ai-copy-mso"
-            sx={{ color: "#121314" }}
+            sx={{ color: "#ffffff" }}
           >
             GitHub
           </Button>
