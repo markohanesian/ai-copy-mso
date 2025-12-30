@@ -1,105 +1,95 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const cors = require('cors');
-const { Pool } = require('pg');
 const axios = require('axios');
+const morgan = require('morgan');
 require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 5000;
 
-// CORS configuration
-const corsOptions = {
-    origin: 'http://localhost:3000', // Allow requests from your frontend URL
-    methods: ['GET', 'POST'], // Specify allowed methods
-    credentials: true, // Enable cookies with cross-origin requests if needed
-};
+// --- Middleware ---
+app.use(morgan('dev')); // Logs requests to the console
+app.use(cors({
+    origin: process.env.FRONTEND_ORIGIN || '*',
+    methods: ['GET', 'POST']
+}));
+app.use(express.json()); // Built-in alternative to body-parser
 
-// Middleware
-app.use(cors(corsOptions)); // Use the CORS middleware with options
-app.use(bodyParser.json());
+// --- Health Check Routes ---
 
-// PostgreSQL connection
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+// Confirm server is alive
+app.get('/', (req, res) => {
+    res.send('AI Copywriting Backend is running.');
 });
 
-// Route for fetching presets
-app.get('/presets', async (req, res) => {
-    try {
-        const result = await pool.query('SELECT * FROM presets');
-        res.json(result.rows);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Server error');
-    }
+// Check API status and configured model
+app.get('/health', (req, res) => {
+    res.json({ 
+        status: 'ok', 
+        hf_model: process.env.HF_MODEL || 'HuggingFaceH4/zephyr-7b-beta' 
+    });
 });
 
-// Route for fetching tones
-app.get('/tones', async (req, res) => {
-    try {
-        const result = await pool.query('SELECT * FROM tones');
-        res.json(result.rows);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Server error');
-    }
-});
+// --- AI Generation Route ---
 
-// Route for fetching industries
-app.get('/industries', async (req, res) => {
-    try {
-        const result = await pool.query('SELECT * FROM industries');
-        res.json(result.rows);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Server error');
-    }
-});
-
-// Route for generating copy
 app.post('/generate', async (req, res) => {
     const { tone, industry, prompt } = req.body;
 
+    // Basic validation
+    if (!tone || !industry || !prompt) {
+        return res.status(400).json({ error: 'Missing required fields: tone, industry, or prompt' });
+    }
+
     try {
-        // OpenAI API call
-        const response = await axios.post(
-            "https://api.openai.com/v1/chat/completions",
-            {
-                model: "gpt-4o-mini", // Update to the latest model
-                messages: [
-                    {
-                        role: "system",
-                        content: "You are a senior copywriter generating copy for products, social media, and other marketing and commerce.",
-                    },
-                    {
-                        role: "user",
-                        content: prompt, // Use the provided user prompt
-                    },
-                ],
-                max_tokens: 100,
-            },
-            {
-                headers: {
-                    Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-                    "Content-Type": "application/json",
+        const hfModel = process.env.HF_MODEL || 'HuggingFaceH4/zephyr-7b-beta';
+        const hfUrl = 'https://router.huggingface.co/v1/chat/completions';
+
+        const hfPayload = {
+            model: hfModel,
+            messages: [
+                { 
+                    role: "system", 
+                    content: `You are a professional copywriter for the ${industry} industry.` 
                 },
-            }
-        );
+                { 
+                    role: "user", 
+                    content: `Write a ${tone} marketing blurb for the following: ${prompt}` 
+                }
+            ],
+            max_tokens: 250,
+            temperature: 0.7
+        };
 
-        const generatedCopy = response.data.choices[0].message.content.trim();
+        const hfResp = await axios.post(hfUrl, hfPayload, {
+            headers: {
+                Authorization: `Bearer ${process.env.HF_API_KEY}`,
+                'Content-Type': 'application/json',
+            },
+        });
 
-        // Save to database
-        await pool.query('INSERT INTO generated_copies (copy, tone, industry) VALUES ($1, $2, $3)', [generatedCopy, tone, industry]);
+        // Extracting text from the OpenAI-compatible response format
+        const generatedCopy = hfResp.data.choices[0].message.content.trim();
 
         res.json({ copy: generatedCopy });
+
     } catch (err) {
-        console.error('Error generating copy:', err);
-        res.status(500).send('Server error');
+        // Detailed logging for the developer
+        const errorDetail = err.response?.data || err.message;
+        console.error('Hugging Face API Error:', errorDetail);
+
+        res.status(500).json({ 
+            error: "Generation failed", 
+            details: errorDetail 
+        });
     }
 });
 
-// Start server
+// --- Server Start ---
 app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+    console.log(`\n🚀 Server running at http://localhost:${port}`);
+    console.log(`🤖 Using Model: ${process.env.HF_MODEL || 'HuggingFaceH4/zephyr-7b-beta'}`);
+    
+    if (!process.env.HF_API_KEY) {
+        console.warn('⚠️  Warning: HF_API_KEY is missing from .env file. Requests will fail.');
+    }
 });
