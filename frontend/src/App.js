@@ -3,6 +3,9 @@ import CopyGenerator from "./components/CopyGenerator";
 import Nav from "./components/Nav";
 import "./App.css";
 import HomeHero from "./components/HomeHero";
+import axios from 'axios';
+
+axios.defaults.baseURL = 'http://localhost:5000';
 
 const App = () => {
   return (
