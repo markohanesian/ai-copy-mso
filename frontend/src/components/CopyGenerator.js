@@ -12,27 +12,31 @@ const CopyGenerator = () => {
     const [generatedCopy, setGeneratedCopy] = useState('');
     const [loading, setLoading] = useState(false); // Loading state
     const [snackbarOpen, setSnackbarOpen] = useState(false); // Snackbar state
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [isError, setIsError] = useState(false);
 
     const handleGenerate = async () => {
-        setLoading(true); // Set loading to true when starting the request
-        try {
-            const response = await axios.post('http://localhost:5000/generate', {
-                tone,
-                industry,
-                prompt,
-            });
-            setGeneratedCopy(response.data.copy);
-        } catch (error) {
-            console.error("Error generating copy:", error);
-        } finally {
-            setLoading(false); // Reset loading state after the request completes
-        }
-    };
-
-    const handleCopy = () => {
-        navigator.clipboard.writeText(generatedCopy);
+    setLoading(true);
+    setIsError(false);
+    try {
+        const response = await axios.post('/generate', { tone, industry, prompt });
+        setGeneratedCopy(response.data.copy);
+        setSnackbarMessage('Generation succeeded!'); // Set specific message
         setSnackbarOpen(true);
-    };
+    } catch (error) {
+        // ... your existing error logic ...
+    } finally {
+        setLoading(false);
+    }
+};
+
+const handleCopy = () => {
+    if (generatedCopy) {
+        navigator.clipboard.writeText(generatedCopy);
+        setSnackbarMessage('Copied to clipboard!'); // Update message before opening
+        setSnackbarOpen(true);
+    }
+};
 
     const handleSnackbarClose = () => {
         setSnackbarOpen(false);
@@ -116,7 +120,7 @@ const CopyGenerator = () => {
                 )
             )}
 
-            <CopySnackbar open={snackbarOpen} onClose={handleSnackbarClose} message="Copied to clipboard!" />
+            <CopySnackbar open={snackbarOpen} onClose={handleSnackbarClose} message={isError ? snackbarMessage : (snackbarMessage || 'Copied to clipboard!')} />
         </Box>
     );
 };
