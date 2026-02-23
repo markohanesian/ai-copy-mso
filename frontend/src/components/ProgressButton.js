@@ -1,5 +1,6 @@
 import * as React from 'react';
 import Button from '@mui/material/Button';
+import SendIcon from '@mui/icons-material/Send';
 import CircularProgress from '@mui/material/CircularProgress';
 import { green } from '@mui/material/colors';
 
@@ -12,8 +13,9 @@ const ProgressButton = ({ loading, onClick, label }) => {
       },
     }),
     width: "-webkit-fill-available",
-    backgroundColor: "#FF5722",
-    textTransform: "none"
+    backgroundColor: "#3700b3",
+    textTransform: "uppercase",
+    fontWeight: "bold"
   };
 
   return (
@@ -22,6 +24,7 @@ const ProgressButton = ({ loading, onClick, label }) => {
       sx={buttonSx}
       disabled={loading}
       onClick={onClick}
+      endIcon={<SendIcon />}
     >
       {loading ? (
         <CircularProgress size={24} sx={{ color: 'white', marginRight: '10px' }} />
