@@ -8,8 +8,7 @@ const HomeHero = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                justifyContent: 'center',
-                height: '30vh',
+                justifyContent: 'flex-start',
                 textAlign: 'center',
                 padding: 3,
             }}
@@ -20,7 +19,7 @@ const HomeHero = () => {
                 sx={{
                     fontFamily: '"Josefin Sans", sans-serif', // New font
                     fontWeight: 700,
-                    fontSize: '3rem',
+                    fontSize: '2rem',
                 }}
             >
                 Generate marketing copy, powered by AI
