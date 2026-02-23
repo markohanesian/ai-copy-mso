@@ -51,7 +51,7 @@ const handleCopy = () => {
                 padding: 2,
                 gap: 2,
                 width: "100%",
-                maxWidth: '400px',
+                maxWidth: '300px',
                 margin: 'auto',
             }}
         >
