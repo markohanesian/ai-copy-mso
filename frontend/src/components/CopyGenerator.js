@@ -58,7 +58,7 @@ const handleCopy = () => {
             <TextField
                 multiline
                 rows={4}
-                placeholder="Enter prompt"
+                placeholder="Enter prompt (e.g., 'Write a product description for a new line of women's jackets.')"
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 variant="outlined"

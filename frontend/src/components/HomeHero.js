@@ -24,18 +24,6 @@ const HomeHero = () => {
             >
                 Generate marketing copy, powered by AI
             </Typography>
-            <Typography
-                variant="h6"
-                component="p"
-                sx={{
-                    fontFamily: 'Inter, sans-serif',
-                    fontWeight: 400,
-                    fontSize: '1rem',
-                    marginTop: 2,
-                }}
-            >
-                "Give me a fun product description for a women's fall jacket."
-            </Typography>
         </Box>
     );
 };
