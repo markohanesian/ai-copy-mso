@@ -27,14 +27,18 @@ export default function ButtonAppBar() {
           <Typography
             variant="h6"
             component="div"
-            sx={{ flexGrow: 1, color: "#3700b3" }}
+            sx={{
+              flexGrow: 1,
+              color: "black",
+              fontFamily: "Prata, serif",
+            }}
           >
-            AI Copy by MSO{" "}
+            AI Copy by MSO
           </Typography>
           <Button
             color="inherit"
             href="https://github.com/markohanesian/ai-copy-mso"
-            sx={{ color: "#3700b3" }}
+            sx={{ color: "black" }}
           >
             GitHub
           </Button>
