@@ -40,11 +40,10 @@ const generateHandler = async (req, res) => {
         const maskedKey = process.env.HF_API_KEY.substring(0, 4) + '****';
         console.log(`API Key detected (masked): ${maskedKey}`);
 
-        const hfModel = process.env.HF_MODEL || 'mistralai/Mistral-7B-Instruct-v0.3';
-        // Use the modern OpenAI-compatible Inference API endpoint
-        const hfUrl = 'https://api-inference.huggingface.co/v1/chat/completions';
+        const hfModel = process.env.HF_MODEL || 'HuggingFaceH4/zephyr-7b-beta';
+        const hfUrl = 'https://router.huggingface.co/v1/chat/completions';
 
-        console.log(`FETCHING EXTERNAL (OpenAI Format): ${hfUrl} with model ${hfModel}`);
+        console.log(`FETCHING VIA ROUTER: ${hfUrl} with model ${hfModel}`);
 
         const hfPayload = {
             model: hfModel,
@@ -59,52 +58,28 @@ const generateHandler = async (req, res) => {
                 }
             ],
             max_tokens: 250,
-            temperature: 0.7,
-            stream: false
+            temperature: 0.7
         };
 
-        const response = await fetch(hfUrl, {
-            method: 'POST',
+        // Use a clean axios instance to avoid global config issues
+        const instance = axios.create();
+        const hfResp = await instance.post(hfUrl, hfPayload, {
             headers: {
-                'Authorization': `Bearer ${process.env.HF_API_KEY}`,
+                Authorization: `Bearer ${process.env.HF_API_KEY}`,
                 'Content-Type': 'application/json',
                 'User-Agent': 'NetlifyFunction/1.0'
             },
-            body: JSON.stringify(hfPayload)
         });
 
-        console.log(`RESPONSE URL: ${response.url}`);
-        console.log(`RESPONSE STATUS: ${response.status}`);
+        console.log(`RESPONSE STATUS: ${hfResp.status}`);
 
-        const text = await response.text();
-        let data;
-        try {
-            data = JSON.parse(text);
-        } catch (e) {
-            console.error('Failed to parse HF response as JSON:', text.substring(0, 100));
-            return res.status(500).json({ error: 'Invalid response format from AI', details: text.substring(0, 200) });
+        if (!hfResp.data?.choices?.[0]?.message?.content) {
+            console.error('Unexpected Hugging Face Response Format:', JSON.stringify(hfResp.data));
+            throw new Error('Invalid response from AI model');
         }
 
-        if (!response.ok) {
-            console.error('Hugging Face API Error Details:', JSON.stringify(data));
-            return res.status(response.status).json({ error: 'Generation failed', details: data });
-        }
-
-        console.log('HF Response Status:', response.status);
-        
-        let generatedCopy = '';
-        if (data.choices && data.choices[0] && data.choices[0].message) {
-            generatedCopy = data.choices[0].message.content;
-        } else if (Array.isArray(data) && data[0].generated_text) {
-            generatedCopy = data[0].generated_text;
-        }
-
-        if (!generatedCopy) {
-            console.error('Unexpected Hugging Face Response Format:', JSON.stringify(data));
-            generatedCopy = typeof data === 'string' ? data : JSON.stringify(data);
-        }
-
-        res.json({ copy: generatedCopy.trim() });
+        const generatedCopy = hfResp.data.choices[0].message.content.trim();
+        res.json({ copy: generatedCopy });
 
     } catch (err) {
         // Detailed logging for Netlify Function logs
