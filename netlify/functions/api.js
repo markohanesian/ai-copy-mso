@@ -34,36 +34,52 @@ app.post('/generate', async (req, res) => {
         const maskedKey = process.env.HF_API_KEY.substring(0, 4) + '****';
         console.log(`API Key detected (masked): ${maskedKey}`);
 
-        const hfModel = process.env.HF_MODEL || 'gpt2';
+        const hfModel = process.env.HF_MODEL || 'mistralai/Mistral-7B-Instruct-v0.2';
         const hfUrl = `https://api-inference.huggingface.co/models/${hfModel}`;
 
-        console.log(`Sanity Check - Model: ${hfModel}`);
-        console.log(`Sanity Check - Endpoint: ${hfUrl}`);
+        console.log(`Using Model: ${hfModel}`);
+        console.log(`Using Endpoint: ${hfUrl}`);
 
         const hfPayload = {
-            inputs: `Write a marketing blurb about: ${prompt}`,
-            options: { wait_for_model: true }
+            inputs: `<s>[INST] You are a professional copywriter for the ${industry} industry. Write a ${tone} marketing blurb for the following: ${prompt} [/INST]`,
+            parameters: {
+                max_new_tokens: 250,
+                temperature: 0.7,
+                return_full_text: false
+            },
+            options: {
+                wait_for_model: true
+            }
         };
 
-        const hfResp = await axios.post(hfUrl, hfPayload, {
+        const response = await fetch(hfUrl, {
+            method: 'POST',
             headers: {
-                Authorization: `Bearer ${process.env.HF_API_KEY}`,
+                'Authorization': `Bearer ${process.env.HF_API_KEY}`,
                 'Content-Type': 'application/json',
             },
-            timeout: 10000
+            body: JSON.stringify(hfPayload)
         });
 
-        console.log('HF Response Status:', hfResp.status);
+        const data = await response.json();
+
+        if (!response.ok) {
+            console.error('Hugging Face API Error Details:', JSON.stringify(data));
+            return res.status(response.status).json({ error: 'Generation failed', details: data });
+        }
+
+        console.log('HF Response Status:', response.status);
         
         let generatedCopy = '';
-        if (Array.isArray(hfResp.data) && hfResp.data.length > 0) {
-            generatedCopy = hfResp.data[0].generated_text || hfResp.data[0].summary_text || "";
-        } else if (hfResp.data && hfResp.data.generated_text) {
-            generatedCopy = hfResp.data.generated_text;
+        if (Array.isArray(data) && data.length > 0) {
+            generatedCopy = data[0].generated_text || data[0].summary_text || "";
+        } else if (data && data.generated_text) {
+            generatedCopy = data.generated_text;
         }
 
         if (!generatedCopy) {
-            generatedCopy = typeof hfResp.data === 'string' ? hfResp.data : JSON.stringify(hfResp.data);
+            console.error('Unexpected Hugging Face Response Format:', JSON.stringify(data));
+            generatedCopy = typeof data === 'string' ? data : JSON.stringify(data);
         }
 
         res.json({ copy: generatedCopy.trim() });
