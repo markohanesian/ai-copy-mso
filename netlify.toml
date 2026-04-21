@@ -14,6 +14,11 @@
   status = 200
 
 [[redirects]]
+  from = "/debug-env"
+  to = "/.netlify/functions/api/debug-env"
+  status = 200
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200

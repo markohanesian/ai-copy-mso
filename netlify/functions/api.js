@@ -29,6 +29,10 @@ app.post('/generate', async (req, res) => {
             return res.status(500).json({ error: 'API Key Configuration Error' });
         }
 
+        // Log masked key for debugging (First 4 chars only)
+        const maskedKey = process.env.HF_API_KEY.substring(0, 4) + '****';
+        console.log(`API Key detected (masked): ${maskedKey}`);
+
         const hfModel = process.env.HF_MODEL || 'HuggingFaceH4/zephyr-7b-beta';
         const hfUrl = 'https://router.huggingface.co/v1/chat/completions';
 
@@ -80,6 +84,15 @@ app.post('/generate', async (req, res) => {
 // For health checks
 app.get('/health', (req, res) => {
     res.json({ status: 'ok', environment: 'serverless' });
+});
+
+// Debug route to check environment status (Safe)
+app.get('/debug-env', (req, res) => {
+    res.json({ 
+        has_key: !!process.env.HF_API_KEY,
+        key_prefix: process.env.HF_API_KEY ? process.env.HF_API_KEY.substring(0, 4) : 'none',
+        model: process.env.HF_MODEL || 'default'
+    });
 });
 
 // Netlify uses /.netlify/functions/api by default
