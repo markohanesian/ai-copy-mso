@@ -1,11 +1,22 @@
 
+:root {
+  --brand-orange: #ff5f00;
+  --bg-dark: #020202;
+  --bg-card: rgba(18, 18, 18, 0.7);
+  --text-primary: #f8f8f8;
+  --text-secondary: #a0a0a0;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
 code {
@@ -13,3 +24,71 @@ code {
     monospace;
 }
 
+/* Background Aurora Effect */
+.aurora-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+  background: var(--bg-dark);
+}
+
+.aurora {
+  position: absolute;
+  width: 150vw;
+  height: 150vh;
+  top: -25vh;
+  left: -25vw;
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 95, 0, 0.08) 0%,
+    rgba(255, 95, 0, 0.03) 30%,
+    transparent 60%
+  );
+  filter: blur(100px);
+  animation: rotate-aurora 30s linear infinite;
+}
+
+.aurora-2 {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  bottom: -20vh;
+  right: -20vw;
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 95, 0, 0.05) 0%,
+    transparent 50%
+  );
+  filter: blur(80px);
+  animation: pulse-aurora 20s ease-in-out infinite alternate;
+}
+
+@keyframes rotate-aurora {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse-aurora {
+  0% { transform: scale(1) translate(0, 0); opacity: 0.5; }
+  50% { transform: scale(1.2) translate(-5vw, -5vh); opacity: 0.8; }
+  100% { transform: scale(1) translate(0, 0); opacity: 0.5; }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+::-webkit-scrollbar-thumb {
+  background: #222;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--brand-orange);
+}

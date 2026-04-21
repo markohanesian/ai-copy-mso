@@ -33,6 +33,7 @@ app.get('/health', (req, res) => {
 // --- AI Generation Route ---
 
 app.post('/generate', async (req, res) => {
+    console.log('Received request for /generate:', req.body);
     const { tone, industry, prompt } = req.body;
 
     // Basic validation

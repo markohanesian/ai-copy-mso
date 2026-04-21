@@ -1,25 +1,29 @@
 import React from 'react';
 import Snackbar from '@mui/material/Snackbar';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
+import Alert from '@mui/material/Alert';
 
-const CopySnackbar = ({ open, onClose, message }) => {
-    const action = (
-        <React.Fragment>
-            <IconButton size="small" aria-label="close" color="inherit" onClick={onClose}>
-                <CloseIcon fontSize="small" />
-            </IconButton>
-        </React.Fragment>
-    );
-
+const CopySnackbar = ({ open, onClose, message, severity = 'success' }) => {
     return (
         <Snackbar
             open={open}
-            autoHideDuration={3000} // Duration for how long the snackbar will show
+            autoHideDuration={4000}
             onClose={onClose}
-            message={message}
-            action={action}
-        />
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        >
+            <Alert 
+                onClose={onClose} 
+                severity={severity} 
+                variant="filled" 
+                sx={{ 
+                    width: '100%', 
+                    borderRadius: 2,
+                    fontWeight: 600,
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
+                }}
+            >
+                {message}
+            </Alert>
+        </Snackbar>
     );
 };
 
