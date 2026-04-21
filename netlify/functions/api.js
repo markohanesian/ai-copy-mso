@@ -21,9 +21,9 @@ app.use((req, res, next) => {
 
 // --- Routes ---
 
-// Re-map the /ai-generate endpoint for the function (avoiding collision with /generate)
-app.post('/ai-generate', async (req, res) => {
-    console.log('Function received /ai-generate request:', req.body);
+// Handle both /generate and /ai-generate for maximum compatibility
+const generateHandler = async (req, res) => {
+    console.log('Function received generation request:', req.body);
     const { tone, industry, prompt } = req.body;
 
     if (!tone || !industry || !prompt) {
@@ -99,7 +99,10 @@ app.post('/ai-generate', async (req, res) => {
             details: errorDetail 
         });
     }
-});
+};
+
+app.post('/generate', generateHandler);
+app.post('/ai-generate', generateHandler);
 
 // For health checks
 app.get('/health', (req, res) => {
