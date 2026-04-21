@@ -35,26 +35,20 @@ app.post('/generate', async (req, res) => {
         console.log(`API Key detected (masked): ${maskedKey}`);
 
         const hfModel = process.env.HF_MODEL || 'HuggingFaceH4/zephyr-7b-beta';
-        // Use the direct Inference API endpoint instead of the router
-        const hfUrl = `https://api-inference.huggingface.co/models/${hfModel}/v1/chat/completions`;
+        // Use the standard Inference API endpoint
+        const hfUrl = `https://api-inference.huggingface.co/models/${hfModel}`;
 
         console.log(`Using Model: ${hfModel}`);
         console.log(`Using Endpoint: ${hfUrl}`);
 
+        // Standard Inference API payload format
         const hfPayload = {
-            model: hfModel,
-            messages: [
-                { 
-                    role: "system", 
-                    content: `You are a professional copywriter for the ${industry} industry.` 
-                },
-                { 
-                    role: "user", 
-                    content: `Write a ${tone} marketing blurb for the following: ${prompt}` 
-                }
-            ],
-            max_tokens: 250,
-            temperature: 0.7
+            inputs: `<|system|>\nYou are a professional copywriter for the ${industry} industry.</s>\n<|user|>\nWrite a ${tone} marketing blurb for the following: ${prompt}</s>\n<|assistant|>\n`,
+            parameters: {
+                max_new_tokens: 250,
+                temperature: 0.7,
+                return_full_text: false
+            }
         };
 
         const hfResp = await axios.post(hfUrl, hfPayload, {
@@ -64,13 +58,20 @@ app.post('/generate', async (req, res) => {
             },
         });
 
-        if (!hfResp.data?.choices?.[0]?.message?.content) {
+        // Extract from standard Inference API response (usually an array)
+        let generatedCopy = '';
+        if (Array.isArray(hfResp.data)) {
+            generatedCopy = hfResp.data[0].generated_text || hfResp.data[0].summary_text;
+        } else if (hfResp.data.generated_text) {
+            generatedCopy = hfResp.data.generated_text;
+        }
+
+        if (!generatedCopy) {
             console.error('Unexpected Hugging Face Response Format:', JSON.stringify(hfResp.data));
             throw new Error('Invalid response from AI model');
         }
 
-        const generatedCopy = hfResp.data.choices[0].message.content.trim();
-        res.json({ copy: generatedCopy });
+        res.json({ copy: generatedCopy.trim() });
 
     } catch (err) {
         // Detailed logging for Netlify Function logs
