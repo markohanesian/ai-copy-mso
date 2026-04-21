@@ -15,9 +15,9 @@ app.use(express.json());
 
 // --- Routes ---
 
-// Re-map the /generate endpoint for the function
-app.post('/generate', async (req, res) => {
-    console.log('Function received /generate request:', req.body);
+// Re-map the /ai-generate endpoint for the function (avoiding collision with /generate)
+app.post('/ai-generate', async (req, res) => {
+    console.log('Function received /ai-generate request:', req.body);
     const { tone, industry, prompt } = req.body;
 
     if (!tone || !industry || !prompt) {
@@ -37,8 +37,7 @@ app.post('/generate', async (req, res) => {
         const hfModel = process.env.HF_MODEL || 'mistralai/Mistral-7B-Instruct-v0.2';
         const hfUrl = `https://api-inference.huggingface.co/models/${hfModel}`;
 
-        console.log(`Using Model: ${hfModel}`);
-        console.log(`Using Endpoint: ${hfUrl}`);
+        console.log(`FETCHING EXTERNAL: ${hfUrl}`);
 
         const hfPayload = {
             inputs: `<s>[INST] You are a professional copywriter for the ${industry} industry. Write a ${tone} marketing blurb for the following: ${prompt} [/INST]`,

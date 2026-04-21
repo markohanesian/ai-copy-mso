@@ -5,7 +5,7 @@
 
 [[redirects]]
   from = "/generate"
-  to = "/.netlify/functions/api/generate"
+  to = "/.netlify/functions/api/ai-generate"
   status = 200
 
 [[redirects]]
