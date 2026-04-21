@@ -34,7 +34,7 @@ app.post('/generate', async (req, res) => {
         const maskedKey = process.env.HF_API_KEY.substring(0, 4) + '****';
         console.log(`API Key detected (masked): ${maskedKey}`);
 
-        const hfModel = process.env.HF_MODEL || 'HuggingFaceH4/zephyr-7b-beta';
+        const hfModel = process.env.HF_MODEL || 'mistralai/Mistral-7B-Instruct-v0.2';
         // Use the standard Inference API endpoint
         const hfUrl = `https://api-inference.huggingface.co/models/${hfModel}`;
 
@@ -43,11 +43,14 @@ app.post('/generate', async (req, res) => {
 
         // Standard Inference API payload format
         const hfPayload = {
-            inputs: `<|system|>\nYou are a professional copywriter for the ${industry} industry.</s>\n<|user|>\nWrite a ${tone} marketing blurb for the following: ${prompt}</s>\n<|assistant|>\n`,
+            inputs: `<s>[INST] You are a professional copywriter for the ${industry} industry. Write a ${tone} marketing blurb for the following: ${prompt} [/INST]`,
             parameters: {
                 max_new_tokens: 250,
                 temperature: 0.7,
                 return_full_text: false
+            },
+            options: {
+                wait_for_model: true
             }
         };
 
@@ -56,19 +59,21 @@ app.post('/generate', async (req, res) => {
                 Authorization: `Bearer ${process.env.HF_API_KEY}`,
                 'Content-Type': 'application/json',
             },
+            timeout: 30000 // 30 second timeout for model loading
         });
 
-        // Extract from standard Inference API response (usually an array)
+        // Extract from standard Inference API response
         let generatedCopy = '';
-        if (Array.isArray(hfResp.data)) {
-            generatedCopy = hfResp.data[0].generated_text || hfResp.data[0].summary_text;
-        } else if (hfResp.data.generated_text) {
+        if (Array.isArray(hfResp.data) && hfResp.data.length > 0) {
+            generatedCopy = hfResp.data[0].generated_text || hfResp.data[0].summary_text || "";
+        } else if (hfResp.data && hfResp.data.generated_text) {
             generatedCopy = hfResp.data.generated_text;
         }
 
         if (!generatedCopy) {
             console.error('Unexpected Hugging Face Response Format:', JSON.stringify(hfResp.data));
-            throw new Error('Invalid response from AI model');
+            // Fallback for some models that return plain text or different objects
+            generatedCopy = typeof hfResp.data === 'string' ? hfResp.data : JSON.stringify(hfResp.data);
         }
 
         res.json({ copy: generatedCopy.trim() });
