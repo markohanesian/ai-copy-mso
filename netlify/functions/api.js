@@ -66,7 +66,17 @@ const generateHandler = async (req, res) => {
             body: JSON.stringify(hfPayload)
         });
 
-        const data = await response.json();
+        console.log(`RESPONSE URL: ${response.url}`);
+        console.log(`RESPONSE STATUS: ${response.status}`);
+
+        const text = await response.text();
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+            console.error('Failed to parse HF response as JSON:', text.substring(0, 100));
+            return res.status(500).json({ error: 'Invalid response format from AI', details: text.substring(0, 200) });
+        }
 
         if (!response.ok) {
             console.error('Hugging Face API Error Details:', JSON.stringify(data));
