@@ -16,14 +16,6 @@ const EDIT_TAGS = [
     { id: 'punchy', label: 'Punchy' },
 ];
 
-const TONE_OPTIONS = [
-    { label: 'Casual', value: 'casual' },
-    { label: 'Formal', value: 'formal' },
-    { label: 'Friendly', value: 'friendly' },
-    { label: 'Exciting', value: 'exciting' },
-    { label: 'Professional', value: 'professional' },
-];
-
 const CopyGenerator = () => {
     const [tone, setTone] = useState(null);
     const [prompt, setPrompt] = useState('');

@@ -4,15 +4,7 @@ import Nav from "./components/Nav";
 import "./App.css";
 import HomeHero from "./components/HomeHero";
 import Footer from "./components/Footer";
-import axios from 'axios';
 import { ThemeProvider, createTheme, CssBaseline, Box } from '@mui/material';
-
-// Set axios base URL
-// In development, we use the proxy set in package.json, so we don't strictly need a baseURL.
-if (process.env.NODE_ENV === 'development') {
-  // Using the proxy in package.json is generally better
-  // axios.defaults.baseURL = 'http://localhost:5000';
-}
 
 const theme = createTheme({
   palette: {
