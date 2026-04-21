@@ -1,6 +1,6 @@
 # CopyAI
 
-![CopyAI Desktop Preview](./frontend/public/images/Copy%20AI%20-screenshot-1.png)
+![CopyAI Desktop Preview](/frontend/public/images/CopyAI-screenshot-1.png)
 
 ## Description
 **CopyAI** is a high-performance marketing copywriting tool designed with a 2026 high-tech aesthetic. It empowers users to generate high-converting social media captions, LinkedIn headlines, and product descriptions in seconds. Featuring a modern dark mode interface with moving aurora gradients and precision-engineered AI refinements.
