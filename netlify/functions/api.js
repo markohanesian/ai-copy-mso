@@ -41,21 +41,26 @@ const generateHandler = async (req, res) => {
         console.log(`API Key detected (masked): ${maskedKey}`);
 
         const hfModel = process.env.HF_MODEL || 'mistralai/Mistral-7B-Instruct-v0.3';
-        const hfUrl = `https://api-inference.huggingface.co/models/${hfModel}`;
+        // Use the modern OpenAI-compatible Inference API endpoint
+        const hfUrl = 'https://api-inference.huggingface.co/v1/chat/completions';
 
-        console.log(`FETCHING EXTERNAL: ${hfUrl}`);
+        console.log(`FETCHING EXTERNAL (OpenAI Format): ${hfUrl} with model ${hfModel}`);
 
         const hfPayload = {
-            inputs: `<s>[INST] You are a professional copywriter for the ${industry} industry. Write a ${tone} marketing blurb for the following: ${prompt} [/INST]`,
-            parameters: {
-                max_new_tokens: 250,
-                temperature: 0.7,
-                return_full_text: false
-            },
-            options: {
-                wait_for_model: true,
-                use_cache: false
-            }
+            model: hfModel,
+            messages: [
+                { 
+                    role: "system", 
+                    content: `You are a professional copywriter for the ${industry} industry.` 
+                },
+                { 
+                    role: "user", 
+                    content: `Write a ${tone} marketing blurb for the following: ${prompt}` 
+                }
+            ],
+            max_tokens: 250,
+            temperature: 0.7,
+            stream: false
         };
 
         const response = await fetch(hfUrl, {
@@ -88,10 +93,10 @@ const generateHandler = async (req, res) => {
         console.log('HF Response Status:', response.status);
         
         let generatedCopy = '';
-        if (Array.isArray(data) && data.length > 0) {
-            generatedCopy = data[0].generated_text || data[0].summary_text || "";
-        } else if (data && data.generated_text) {
-            generatedCopy = data.generated_text;
+        if (data.choices && data.choices[0] && data.choices[0].message) {
+            generatedCopy = data.choices[0].message.content;
+        } else if (Array.isArray(data) && data[0].generated_text) {
+            generatedCopy = data[0].generated_text;
         }
 
         if (!generatedCopy) {
