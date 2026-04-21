@@ -13,6 +13,12 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Global path logger
+app.use((req, res, next) => {
+    console.log(`Incoming Request: ${req.method} ${req.path}`);
+    next();
+});
+
 // --- Routes ---
 
 // Re-map the /ai-generate endpoint for the function (avoiding collision with /generate)
