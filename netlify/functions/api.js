@@ -34,24 +34,15 @@ app.post('/generate', async (req, res) => {
         const maskedKey = process.env.HF_API_KEY.substring(0, 4) + '****';
         console.log(`API Key detected (masked): ${maskedKey}`);
 
-        const hfModel = process.env.HF_MODEL || 'mistralai/Mistral-7B-Instruct-v0.2';
-        // Use the standard Inference API endpoint
+        const hfModel = process.env.HF_MODEL || 'gpt2';
         const hfUrl = `https://api-inference.huggingface.co/models/${hfModel}`;
 
-        console.log(`Using Model: ${hfModel}`);
-        console.log(`Using Endpoint: ${hfUrl}`);
+        console.log(`Sanity Check - Model: ${hfModel}`);
+        console.log(`Sanity Check - Endpoint: ${hfUrl}`);
 
-        // Standard Inference API payload format
         const hfPayload = {
-            inputs: `<s>[INST] You are a professional copywriter for the ${industry} industry. Write a ${tone} marketing blurb for the following: ${prompt} [/INST]`,
-            parameters: {
-                max_new_tokens: 250,
-                temperature: 0.7,
-                return_full_text: false
-            },
-            options: {
-                wait_for_model: true
-            }
+            inputs: `Write a marketing blurb about: ${prompt}`,
+            options: { wait_for_model: true }
         };
 
         const hfResp = await axios.post(hfUrl, hfPayload, {
@@ -59,10 +50,11 @@ app.post('/generate', async (req, res) => {
                 Authorization: `Bearer ${process.env.HF_API_KEY}`,
                 'Content-Type': 'application/json',
             },
-            timeout: 30000 // 30 second timeout for model loading
+            timeout: 10000
         });
 
-        // Extract from standard Inference API response
+        console.log('HF Response Status:', hfResp.status);
+        
         let generatedCopy = '';
         if (Array.isArray(hfResp.data) && hfResp.data.length > 0) {
             generatedCopy = hfResp.data[0].generated_text || hfResp.data[0].summary_text || "";
@@ -71,8 +63,6 @@ app.post('/generate', async (req, res) => {
         }
 
         if (!generatedCopy) {
-            console.error('Unexpected Hugging Face Response Format:', JSON.stringify(hfResp.data));
-            // Fallback for some models that return plain text or different objects
             generatedCopy = typeof hfResp.data === 'string' ? hfResp.data : JSON.stringify(hfResp.data);
         }
 
