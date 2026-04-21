@@ -1,11 +1,6 @@
 [build]
-  # This command works whether Netlify starts in the root or in the /frontend folder
-  command = "if [ -d frontend ]; then npm install && cd frontend && npm install && npm run build; else npm install && npm run build; fi"
-  
-  # Publish directory relative to the root
+  command = "npm install && cd frontend && npm install && npm run build"
   publish = "frontend/build"
-  
-  # Functions directory relative to the root
   functions = "netlify/functions"
 
 [functions]
