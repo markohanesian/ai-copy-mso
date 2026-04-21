@@ -40,7 +40,7 @@ const generateHandler = async (req, res) => {
         const maskedKey = process.env.HF_API_KEY.substring(0, 4) + '****';
         console.log(`API Key detected (masked): ${maskedKey}`);
 
-        const hfModel = process.env.HF_MODEL || 'mistralai/Mistral-7B-Instruct-v0.2';
+        const hfModel = process.env.HF_MODEL || 'mistralai/Mistral-7B-Instruct-v0.3';
         const hfUrl = `https://api-inference.huggingface.co/models/${hfModel}`;
 
         console.log(`FETCHING EXTERNAL: ${hfUrl}`);
@@ -53,7 +53,8 @@ const generateHandler = async (req, res) => {
                 return_full_text: false
             },
             options: {
-                wait_for_model: true
+                wait_for_model: true,
+                use_cache: false
             }
         };
 
@@ -62,6 +63,7 @@ const generateHandler = async (req, res) => {
             headers: {
                 'Authorization': `Bearer ${process.env.HF_API_KEY}`,
                 'Content-Type': 'application/json',
+                'User-Agent': 'NetlifyFunction/1.0'
             },
             body: JSON.stringify(hfPayload)
         });
