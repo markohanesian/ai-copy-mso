@@ -35,9 +35,11 @@ app.post('/generate', async (req, res) => {
         console.log(`API Key detected (masked): ${maskedKey}`);
 
         const hfModel = process.env.HF_MODEL || 'HuggingFaceH4/zephyr-7b-beta';
-        const hfUrl = 'https://router.huggingface.co/v1/chat/completions';
+        // Use the direct Inference API endpoint instead of the router
+        const hfUrl = `https://api-inference.huggingface.co/models/${hfModel}/v1/chat/completions`;
 
         console.log(`Using Model: ${hfModel}`);
+        console.log(`Using Endpoint: ${hfUrl}`);
 
         const hfPayload = {
             model: hfModel,
