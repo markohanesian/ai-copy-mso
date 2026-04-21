@@ -24,8 +24,15 @@ app.post('/generate', async (req, res) => {
     }
 
     try {
+        if (!process.env.HF_API_KEY) {
+            console.error('CRITICAL: HF_API_KEY is not defined in environment variables.');
+            return res.status(500).json({ error: 'API Key Configuration Error' });
+        }
+
         const hfModel = process.env.HF_MODEL || 'HuggingFaceH4/zephyr-7b-beta';
         const hfUrl = 'https://router.huggingface.co/v1/chat/completions';
+
+        console.log(`Using Model: ${hfModel}`);
 
         const hfPayload = {
             model: hfModel,
@@ -50,13 +57,23 @@ app.post('/generate', async (req, res) => {
             },
         });
 
+        if (!hfResp.data?.choices?.[0]?.message?.content) {
+            console.error('Unexpected Hugging Face Response Format:', JSON.stringify(hfResp.data));
+            throw new Error('Invalid response from AI model');
+        }
+
         const generatedCopy = hfResp.data.choices[0].message.content.trim();
         res.json({ copy: generatedCopy });
 
     } catch (err) {
+        // Detailed logging for Netlify Function logs
         const errorDetail = err.response?.data || err.message;
-        console.error('Hugging Face API Error:', errorDetail);
-        res.status(500).json({ error: "Generation failed", details: errorDetail });
+        console.error('Hugging Face API Error Details:', JSON.stringify(errorDetail));
+
+        res.status(500).json({ 
+            error: "Generation failed", 
+            details: errorDetail 
+        });
     }
 });
 
